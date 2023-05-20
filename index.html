@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Search</title>
+
+    <link rel="stylesheet" href="style/reboot.css" />
+
+    <style>
+    #keyword {
+        font-size: 16pt;
+        width: 100%;
+        padding: 3pt 5pt;
+    }
+
+    input, button {
+        border-radius: 3px;
+        border: 1px solid #aaa;
+    }
+
+    .filter {
+        margin-bottom: 15px;
+        margin: 10pt;
+    }
+
+    .highlight {
+       background-color: yellow;
+    }
+
+    .highlight-title {
+     background-color: green;
+    }
+
+    .file-separator {
+        border-top: 1px solid black;
+        margin-top: 10px;
+    }
+    .filter-button {
+        background-color: #ddd;
+        border: none;
+        color: #000;
+        padding: 5px 7px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+    }
+
+    .filter-button.active {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .hidden {
+     display: none;
+    }
+
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="main">
+        <div class="filters">
+            <div class="filter">
+                <input type="text" id="keyword" placeholder="This text is sourced from YouTube transcripts, so the grammar may not be accurate" onchange="search()" />
+            </div>
+
+            <div class="filter filter-channels">
+                <button class="filter-button filter-button-title" onclick="toggleFilter('title', 'After Dark')" data-filter-type="title" data-filter-value="After Dark">After Dark</button>
+                <button class="filter-button filter-button-title" onclick="toggleFilter('title', 'off the rails')" data-filter-type="title" data-filter-value="off the rails">off the rails</button>
+                <button class="filter-button filter-button-title" onclick="toggleFilter('title', 'H3TV')" data-filter-type="title" data-filter-value="H3TV">H3TV</button>
+                <button class="filter-button filter-button-title" onclick="toggleFilter('title', 'Leftovers')" data-filter-type="title" data-filter-value="Leftovers">Leftovers</button>
+                <button class="filter-button filter-button-title" onclick="toggleFilter('title', 'Famelies')" data-filter-type="title" data-filter-value="Famelies">Famelies</button>
+                <button class="filter-button filter-button-title" onclick="toggleFilter('title', 'Frenemies')" data-filter-type="title" data-filter-value="Frenemies">Frenemies</button>
+                <button class="filter-button filter-button-title" onclick="toggleFilter('title', 'Content Court')" data-filter-type="title" data-filter-value="Content Court">Content Court</button>
+            </div>
+
+            <div class="filter">
+                <input
+                        type="text"
+                        id="title_keyword"
+                        placeholder="Episode title keyword"
+                        onchange="search()">
+            </div>
+
+            <div class="filter">
+                <button class="filter-button filter-button-year" onclick="toggleFilter('year', '2017')" data-filter-type="year" data-filter-value="2017">2017</button>
+                <button class="filter-button filter-button-year" onclick="toggleFilter('year', '2018')" data-filter-type="year" data-filter-value="2018">2018</button>
+                <button class="filter-button filter-button-year" onclick="toggleFilter('year', '2019')" data-filter-type="year" data-filter-value="2019">2019</button>
+                <button class="filter-button filter-button-year" onclick="toggleFilter('year', '2020')" data-filter-type="year" data-filter-value="2020">2020</button>
+                <button class="filter-button filter-button-year" onclick="toggleFilter('year', '2021')" data-filter-type="year" data-filter-value="2021">2021</button>
+                <button class="filter-button filter-button-year" onclick="toggleFilter('year', '2022')" data-filter-type="year" data-filter-value="2022">2022</button>
+                <button class="filter-button filter-button-year" onclick="toggleFilter('year', '2023')" data-filter-type="year" data-filter-value="2023">2023</button>
+            </div>
+
+            <div class="filter">
+                <button class="filter-button custom-button" onclick="toggleFilter('month', 'January')" data-filter-type="month" data-filter-value="January">Jan</button>
+                <button class="filter-button custom-button" onclick="toggleFilter('month', 'February')" data-filter-type="month" data-filter-value="February">Feb</button>
+                <button class="filter-button custom-button" onclick="toggleFilter('month', 'March')" data-filter-type="month" data-filter-value="March">Mar</button>
+                <button class="filter-button custom-button" onclick="toggleFilter('month', 'April')" data-filter-type="month" data-filter-value="April">Apr</button>
+                <button class="filter-button custom-button" onclick="toggleFilter('month', 'May')" data-filter-type="month" data-filter-value="May">May</button>
+                <button class="filter-button custom-button" onclick="toggleFilter('month', 'June')" data-filter-type="month" data-filter-value="June">Jun</button>
+                <button class="filter-button custom-button" onclick="toggleFilter('month', 'July')" data-filter-type="month" data-filter-value="July">Jul</button>
+                <button class="filter-button custom-button" onclick="toggleFilter('month', 'August')" data-filter-type="month" data-filter-value="August">Aug</button>
+                <button class="filter-button custom-button" onclick="toggleFilter('month', 'September')" data-filter-type="month" data-filter-value="September">Sep</button>
+                <button class="filter-button custom-button" onclick="toggleFilter('month', 'October')" data-filter-type="month" data-filter-value="October">Oct</button>
+                <button class="filter-button custom-button" onclick="toggleFilter('month', 'November')" data-filter-type="month" data-filter-value="November">Nov</button>
+                <button class="filter-button custom-button" onclick="toggleFilter('month', 'December')" data-filter-type="month" data-filter-value="December">Dec</button>
+            </div>
+			
+			<div class="filter" id="countSection">
+				Found: <span id="keywordCount">0</span> matches
+			</div>
+			
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+
+    <script src="episodes.js"></script>
+    <script>
+var results = [];
+var activeFilters = {};
+var isFilterActive = false;
+
+search();
+
+function search() {
+    var keyword = $("#keyword").val();
+    var episodeKeyword = $("#title_keyword").val();
+
+    if (keyword.length < 3) {
+        results = [];
+        applyFilters();
+        displayFilteredResults(results);
+        return;
+    }
+
+    results = [];
+
+    for (const episode of episodes) {
+        for (const line of episode.transcripts) {
+            if (
+                line.text.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+
+                && (
+                    (episodeKeyword == "" || episodeKeyword == null)
+                    || episode.title.toLowerCase().indexOf(episodeKeyword.toLowerCase())
+                )
+            ) {
+                results.push({
+                    timestamp: line.time,
+                    timestampLink: line.url,
+                    sentence: line.text,
+                    title: episode.title,
+                    date: episode.date
+                });
+            }
+        }
+    }
+
+    applyFilters();
+}
+
+function toggleFilter(filterType, filterValue) {
+  if (!activeFilters[filterType]) {
+    // Filter button is not active, so add the filter value
+    activeFilters[filterType] = [filterValue];
+  } else {
+    // Filter button is already active, so check if the filter value is already selected
+    var index = activeFilters[filterType].indexOf(filterValue);
+    if (index > -1) {
+      // Filter value is already selected, so remove it
+      activeFilters[filterType].splice(index, 1);
+      if (activeFilters[filterType].length === 0) {
+        delete activeFilters[filterType];
+      }
+    } else {
+      // Filter value is not selected, so add it
+      activeFilters[filterType].push(filterValue);
+    }
+  }
+
+  isFilterActive = Object.keys(activeFilters).length > 0;
+
+  // Call the applyFilters() function to apply the filters
+  applyFilters();
+}
+
+
+
+function updateFilterButtons() {
+  var filterButtons = $(".filter-button");
+
+  filterButtons.each(function() {
+    var filterButton = $(this);
+    var filterType = filterButton.data("filter-type");
+    var filterValue = filterButton.data("filter-value");
+    let hasMatch = false;
+
+    for(const result of results) {
+        if (filterType == "title") {
+            if (result.title.includes(filterValue)) {
+                hasMatch = true;
+                break;
+            }
+        } else {
+            if (result.date.includes(filterValue)) {
+                hasMatch = true;
+                break;
+            }
+        }
+    }
+
+    if (hasMatch) {
+        filterButton.removeClass("hidden");
+    } else {
+        filterButton.addClass("hidden");
+    }
+
+
+    if (activeFilters[filterType] && activeFilters[filterType].includes(filterValue)) {
+      filterButton.addClass("active");
+    } else {
+      filterButton.removeClass("active");
+    }
+  });
+
+  // Update the year filter buttons separately
+  var yearButtons = $(".filter-button-year");
+
+  yearButtons.each(function() {
+    var yearButton = $(this);
+    var yearValue = "" + yearButton.data("filter-value");
+    if (activeFilters["year"] && activeFilters["year"].includes(yearValue)) {
+      yearButton.addClass("active");
+    } else {
+      yearButton.removeClass("active");
+    }
+  });
+}
+
+
+
+function applyFilters() {
+  // Apply keyword filtering
+  var keyword = $("#keyword").val().toLowerCase();
+  var title_keyword = $("#title_keyword").val().toLowerCase();
+  if (keyword.length > 0 || title_keyword.length > 0) {
+    results = results.filter(function(result) {
+      var sentence = result.sentence.toLowerCase();
+      var title = result.title.toLowerCase();
+      return sentence.includes(keyword) && title.includes(title_keyword);
+    });
+  }
+
+  // Check if any filters are active
+  if (isFilterActive) {
+    results = results.filter(function(result) {
+      for (var filterType in activeFilters) {
+        if (activeFilters.hasOwnProperty(filterType)) {
+          var filterValues = activeFilters[filterType];
+
+          if (filterType === "year") {
+            var date = result.date;
+            var year = date.split(" ")[2];
+            if (!filterValues.includes(year)) {
+              return false;
+            }
+          } else if (filterType === "month") {
+            var date = result.date;
+            var month = date.split(" ")[0];
+            if (!filterValues.includes(month)) {
+              return false;
+            }
+          } else if (filterType === "title") {
+            var title = result.title;
+            if (!filterValues.some(fv => title.toLowerCase().includes(fv.toLowerCase()))) {
+              return false;
+            }
+          }
+        }
+      }
+
+      return true;
+    });
+  }
+
+  // Sort the results by the newest to the oldest date
+  results.sort(function(a, b) {
+    var dateA = new Date(a.date);
+    var dateB = new Date(b.date);
+    return dateB - dateA;
+  });
+
+  updateFilterButtons();
+  displayFilteredResults(results);
+}
+
+
+function displayFilteredResults(filteredResults) {
+  var resultsContainer = $("#results");
+  resultsContainer.html("");
+  // Calculate the count of highlighted keyword occurrences
+var keywordCount = 0;
+filteredResults.forEach(function(result) {
+  var matches = result.sentence.match(new RegExp($("#keyword").val(), "gi"));
+  if (matches) {
+    keywordCount += matches.length;
+  }
+});
+
+// Display the keyword count
+$("#keywordCount").text(keywordCount);
+
+  if (filteredResults.length === 0) {
+    resultsContainer.text("No results found.");
+    return;
+  }
+
+  var lastFile = "";
+  filteredResults.forEach(function(result) {
+    var div = document.createElement("div");
+
+    // Check if the file has changed
+    if (result.title !== lastFile) {
+      var fileSeparator = document.createElement("div");
+      fileSeparator.className = "file-separator";
+      resultsContainer.append(fileSeparator);
+
+      // Display the title and date of the file
+      var fileTitle = document.createElement("div");
+      fileTitle.innerHTML = "<strong>Title:</strong> " + ((result.title).replace(new RegExp($("#title_keyword").val(), "gi"), function(match) {
+        return "<span class='highlight-title'>" + match + "</span>";
+      }));
+      resultsContainer.append(fileTitle);
+
+      var fileDate = document.createElement("div");
+      fileDate.innerHTML = "<strong>Date:</strong> " + result.date;
+      resultsContainer.append(fileDate);
+
+      lastFile = result.title;
+    }
+
+    // Check if the timestamp has a hyperlink
+    if (result.timestampLink) {
+      var timestamp = result.timestamp;
+      var formattedTimestamp = new Date(timestamp * 1000).toISOString().substr(11, 8).replace(/^0+/, '');
+
+      if (formattedTimestamp.startsWith(':')) {
+        formattedTimestamp = formattedTimestamp.substr(1);
+      }
+
+      var timestampLink = document.createElement("a");
+      timestampLink.href = result.timestampLink;
+      timestampLink.target = "_blank";
+
+      if (timestamp === 0) {
+        formattedTimestamp += " (0 sec)";
+      }
+
+      timestampLink.innerText = formattedTimestamp;
+      div.appendChild(timestampLink);
+    }
+
+    var separator = document.createElement("span");
+    separator.innerText = " - ";
+    div.appendChild(separator);
+
+    var sentence = document.createElement("span");
+    sentence.innerHTML = result.sentence.replace(new RegExp($("#keyword").val(), "gi"), function(match) {
+      return "<span class='highlight'>" + match + "</span>";
+    });
+
+    div.appendChild(sentence);
+    resultsContainer.append(div);
+  });
+}
+
+    </script>
+</body>
+</html>
